@@ -1,0 +1,27 @@
+name: deploy-payments
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'payments/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2   
+      #- uses: digitalocean/action-doctl@v2 (Cloud vendor specific use here)
+      - run: cd payments && docker build -t sumanthmanchala/ticketing-payments
+      - run: docker login -U $DOCKER_USERNAME -p $DOCKER_PASSWORD
+        env:
+          $DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          $DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      - run: docker push sumanthmanchala/ticketing-payments
+      # - uses: digitalocean/action-doctl@v2
+      #   with:
+      #       token: ${{secrets.DIGITALOCEAN_ACCESS_TOKEN}} 
+      # - run: doctl kubernetes cluster kubeconfig save ticketing
+      # - run: kubectl rollout restart deployment payments-depl
+         
